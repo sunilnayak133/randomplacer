@@ -30,6 +30,9 @@ public class randomplacer : MonoBehaviour {
     [SerializeField]
     [Range(0.0f,1.0f)]
     private float density;
+    
+    [SerializeField]
+    private GameObject environment;
 
     //number of objects generated
     private int numObj;
