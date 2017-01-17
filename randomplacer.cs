@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
+[ExecuteInEditMode]
+
 public class randomplacer : MonoBehaviour {
 
     // array of objects to be randomly generated 
@@ -26,6 +28,7 @@ public class randomplacer : MonoBehaviour {
 
     //density of random objects (direct correlation to number)
     [SerializeField]
+    [Range(0.0f,1.0f)]
     private float density;
 
     //number of objects generated
@@ -70,7 +73,8 @@ public class randomplacer : MonoBehaviour {
             //to randomize rotation about y axis
             Quaternion rot = Quaternion.identity;
             rot.eulerAngles = new Vector3(0, Random.Range(0, 180), 0);
-            Instantiate(envObj[track], new Vector3(randx, ty, randz),rot);
+            GameObject newenvobj = Instantiate(envObj[track], new Vector3(randx, ty, randz),rot) as GameObject;
+            newenvobj.transform.parent = environment.transform;
             count += 1;
         }
         
