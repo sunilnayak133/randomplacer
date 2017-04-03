@@ -1,87 +1,94 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-[ExecuteInEditMode]
-
-public class randomplacer : MonoBehaviour {
-
-    // array of objects to be randomly generated 
-    public GameObject[] envObj;
-
-    // make sure length of weights = length of envObj
-    // bigger number = more weight
-    public float[] weights;
+public class randomplacer : MonoBehaviour
+{
+    [System.Serializable]
+    public struct objWt
+    {
+        //array of objects to be randomly generated 
+        public GameObject go;
+        // weight of that particular game object
+        public float weight;
+    };
+    
+    // the list containing game objects and their weights
+    public List<objWt> _objectWeights;
 
     //bounds of terrain
-    public float bx_start;
-    public float bz_start;
-    public float bx_end;
-    public float bz_end;
+    public float _bx_start;
+    public float _bz_start;
+    public float _bx_end;
+    public float _bz_end;
 
     // y co-ord of terrain
-    private float ty = 0;
+    private float _ty = 0;
 
     //random numbers generated
-    [SerializeField]
-    private float randx;
-    private float randz;
+    private float _randx;
+    private float _randz;
 
     //density of random objects (direct correlation to number)
     [SerializeField]
-    [Range(0.0f,1.0f)]
-    private float density;
-    
+    [Range(0.0f, 1.0f)]
+    private float _density;
+
+    //the parent object of the random objects that are generated
     [SerializeField]
-    private GameObject environment;
+    private GameObject _environment;
 
     //number of objects generated
-    private int numObj;
-
-	// Use this for initialization
-	void Start () {
+    private int _numObj;
+    
+    void Start()
+    {
+        // sum of weights
         float wsum = 0;
-        for(int i =0; i<weights.Length ;i++) 
+
+        // find the sum of the weights (to assign relative weights later)
+        for (int i = 0; i < _objectWeights.Count; i++)
         {
-            wsum += weights[i];
+            wsum += _objectWeights[i].weight;
         }
 
         //set y
-        ty = transform.localPosition.y;
+        _ty = transform.localPosition.y;
 
         //find total number of objects
-        numObj = (int)Mathf.Ceil(density) * 100;
-        
+        _numObj = (int)Mathf.Ceil(_density) * 100;
+
         //count = num of objs generated, 
         //track = type of obj (index of weights array)
-        int count = 0, track=0;
+        int count = 0, track = 0;
 
         //wtrack = num of objs of type track.
-        int wtrack = (int) (numObj * weights[track] / wsum);
+        int wtrack = (int)(_numObj * _objectWeights[track].weight / wsum);
 
-        for(int i = 0; i < numObj; i++)
-        {   
-             
-            if(count>wtrack)
-            {                
+        for (int i = 0; i < _numObj; i++)
+        {
+
+            if (count > wtrack)
+            {
                 //set count to 0, change track and wtrack
                 count = 0;
                 track += 1;
-                wtrack = (int)(numObj * weights[track] / wsum);
+                wtrack = (int)(_numObj * _objectWeights[track].weight / wsum);
             }
 
-            randx = Random.Range(bx_start, bx_end);
-            randz = Random.Range(bz_start, bz_end);
-            
+            _randx = Random.Range(_bx_start, _bx_end);
+            _randz = Random.Range(_bz_start, _bz_end);
+
 
             //to randomize rotation about y axis
             Quaternion rot = Quaternion.identity;
             rot.eulerAngles = new Vector3(0, Random.Range(0, 180), 0);
-            GameObject newenvobj = Instantiate(envObj[track], new Vector3(randx, ty, randz),rot) as GameObject;
-            newenvobj.transform.parent = environment.transform;
+            GameObject newenvobj = Instantiate(_objectWeights[track].go, new Vector3(_randx, _ty, _randz), rot) as GameObject;
+            newenvobj.transform.parent = _environment.transform;
             count += 1;
         }
-        
-	}
-	
+
+    }
+
 
 }
